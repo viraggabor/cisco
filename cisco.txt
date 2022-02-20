@@ -1,0 +1,332 @@
+Alap konf: // ha esetleg sok eszköznek (2-tõl több) kell egy alapkonfigurációt csinálni ugyanazokkal a jelszavakkal  ajánlom hogy itt írd a jelszavakat és másold be a kódot a paste funkcióval a packet tracert-be és a kedves vendég szövegért feleõséget nem vállalok
+
+ena
+conf t
+ena sec <jelszó>
+ser pass
+line vty 0 15
+pass <jelszó>
+login
+line con 0
+pass <jelszó>
+login
+exit
+banner motd #Isten hozott kedves vendeg!# 
+hostname valami
+
+Security cuccok:
+
+ena
+conf t
+login block-for <idõ mp-ben> attempts <próbák száma> within <idõ mp-ben> //blokkolja a belépést ha sokszor elrontjuk
+security password min-length <szám> //a jelszavaknak minimum ilyen hosszúnak kell lenniük
+line vty <vonalak száma> // konzol vonalon is ugyanúgy müködik
+exec-timeout <perc> <mp> // ennyi idõ után le dob az adott vonalról 
+
+
+SSH:	
+	ena
+	conf t
+	hostname <valami>
+	ip domain-name <atesz.local>
+	username <valaki> privililge <0-15> password <jelszó>
+	crypto key generate rsa 
+	line vty 0 15
+	transport input ssh
+	login local
+
+
+DHCP:
+ena
+conf t
+ip dhcp ex <192.168.1.1> <192.168.1.69> // tól-ig tartományba nem oszhatóvá teszi a címeket
+ip dhcp pool <valami>
+network <192.168.1.0> <255.255.255.128> //valami hálócím + maszk
+default-router <192.168.1.126>
+dns-server <8.8.8.8> 
+
+
+VLAN:
+	
+	switch: //switchen szükséges konfiguráció
+	ena 
+	conf t
+	vlan <szám> //létrehozza a vlant
+	name <akármi>
+	exit
+	int <int. azon>	---> több esetén int range <kezdõ port> <záró> //ez(ek) ami a gép/szerver felé megy azon a portokon kell kiadni
+	sw mo ac
+	sw ac vlan <vlan id>
+	int <int. azon>
+	sw mode tr // azon az interfacen kell kiadni mely a router felé megy 
+	
+	router: //routeren szükséges konfiguráció
+	ena
+	conf t
+	int <alint. azon.> (pl fa0/0.10)
+	encapsulation dot1q <vlan id>
+	ip add <átjáró> <maszk>
+	exit --->a rendes int.-et kell bekapcsolni
+
+
+Etherchannel:
+	
+	PAgP:
+	ena
+	conf t
+	int <int. azon> || int range <kezdõ int. azon> <vég int azon> // feladattól függ melyiket kell használni
+	sh 
+	channel-group <azon> mode desirable
+	no shut
+	int port-channel <azon>
+	sw mode tr
+	
+	LACP
+	ena
+	conf t
+	int <int. azon> || int range <kezdõ int. azon> <vég int azon> // feladattól függ melyiket kell használni
+	sh 
+	channel-group <azon> mode active
+	no shut
+	int port-channel <azon>
+	sw mode tr
+	
+	Negotiated LACP //egyik switchen aktív állapot a másik switchen passzív
+	
+	S1
+	ena
+	conf t
+	int <int. azon> || int range <kezdõ int. azon> <vég int azon> // feladattól függ melyiket kell használni
+	sh 
+	channel-group <azon> mode active
+	no shut
+	int port-channel <azon>
+	sw mode tr
+	
+	S2
+	ena
+	conf t
+	int <int. azon> || int range <kezdõ int. azon> <vég int azon> // feladattól függ melyiket kell használni
+	sh 
+	channel-group <azon> mode passive
+	no shut
+	int port-channel <azon>
+	sw mode tr
+	
+
+STP:
+	ena
+	conf t
+	spanning-tree mode <stp/rstp/mst> //rstp a default állapot szóval elvileg nem kell ezen változtatni
+	spanning-tree priority <szám> // priority minél kisebb annál elõbb van alapérték 32768 a lépték elvileg 4096? 
+	
+	opcionális parancsok
+	spanning-tree hello-time <mp (1-10)> //alapértelmezett a 2,  hello üzenetet küld a többi eszköznek
+	spanning-tree max-age <mp (max 40)> 
+	spanning-tree forward-time <mp>
+	spanning-tree loopback-guard 	
+
+
+FHRP:
+	
+	ena 
+	conf t
+	int <int azon>
+	standby ver 2 // ver1 csak az ipv4-et  támogatja
+	standby 1 ip <virtuális átjáró címe>
+	------  csak a fönök routeren kell vagy ahol a prioritást változtatunk 
+	standby 1 priority <szám> // olyan szám mely 100-nál nagyobb mivel a 100 az alapérték, ezzel a "fönök" routert állítjuk be 
+	standby 1 preempt
+	------
+	
+	
+
+--------------
+
+Forgalom irányítás:
+
+	Statikus:
+
+		ena
+		conf t
+		ip route 0.0.0.0 0.0.0.0 <köv. ugrás> ---> legegyszerûbb
+		ip route <cél> <cél maszk> <köv ugrás>
+
+	Dinamikus:
+
+		RIP:
+			ena
+			conf t
+			router rip
+			ver 2
+			no auto
+			network 192.168.0.0
+			def or --> statikus útvonalak hirdetése
+			pass <int. azon.>
+			
+		OSPF:
+			ena
+			conf t
+			router ospf <1-65535>
+			network <hál. cím> <hál. wildcard maszk> area <terület azon.> //wildcard maszk = maszknak az "inverze" -> 255.255.255.0 akkor 0.0.0.255
+			def or --> statikus útvonalak hirdetése
+			pass <int. azon.>
+			
+		EIGRP:
+			ena
+			conf t
+			router eigrp <1-65535>
+			network <hál. cím> <maszk/umaszk> ---> maszk nem fontos
+			pass <int. azon.>
+			red stat --> alapértelmezett útvonalak hirdetése
+		
+
+
+
+	
+----------advanced level shit-------------	
+
+
+EIGRP-hez kapcsolódó parancsok (hitelesítés):
+
+	Router(config)#key chain Kulcs									
+	Router(config-keychain)# key 1
+	Router(config-keychain-key)# key-string jelszo
+	Router(config)#interface fa0/0
+	Router(config-if)#ip authentication key-chain eigrp 1 kulcs
+	Router(config-if)#ip authentication mode eigrp 1 md5
+
+OSPF-hez kapcsolódó parancsok:
+
+	Hitelesítés jelszóval:
+		(config-router)#area 0 authentication
+		(config-if)#ip ospf authentication-key <titok>
+		
+	Hitelesítés md5-tel:
+		(config-router)#area 0 authentication message-digest
+		(config-if)#ip ospf message-digest-key 1 md5 <titok123>
+		
+NAT:
+
+	statikus: 
+		ena
+		conf t
+		ip nat inside source static <helyi  lokális IP> <helyi globális>
+		int <belsõ int.>
+		ip nat inside
+		int <külsõ int.>
+		ip nat outside
+	
+	dinamikus:
+	
+		ena
+		conf t
+		access-list <1-99> permit <hál cím> <wildcard>
+		ip nat pool <pool neve> <kezdõ külsõ IP> <záró külsõ IP> netmask <külsõ hál. maszkja>
+		ip nat inside source list <ACL azon.> pool <pool neve>
+		int <belsõ int.>
+		ip nat inside
+		int <külsõ int.>
+		ip nat outside
+		
+ACL:
+
+	sima: --> a célhoz legközelebb célszerû elhelyezni
+		ena
+		conf t
+		access-list <1-99> <permit/deny> <hál cím> <wildcard> //1. lehetõség
+		access-list <1-99> <permit/deny> <any>
+		access-list <1-99> <permit/deny> <host> <állomás címe>
+		int <bejövõ int.>
+		ip access-group <ACL száma> in
+		int <kimenõ int.>
+		ip access-group <ACL száma> out
+	
+	kiterjesztett:
+		ena
+		conf t
+		access-list <100-199> <permit/deny> <protokoll(?)> <hál cím> <wildcard> //1. lehetõség	
+		access-list <100-199> <permit/deny> <protokoll(?)> <any> //2. lehetõség
+		access-list <100-199> <permit/deny> <protokoll(?)> <host> <állomás címe> //3. lehetõség
+		
+		access-list <100-199> permit ip any any --> fontos 
+		
+		int <bejövõ int.>
+		ip access-group <ACL száma> in
+		int <kimenõ int.>
+		ip access-group <ACL száma> out
+		
+
+	
+	
+CHAP:
+
+	R1(config)#username <R2> password <jelszó>
+	R1(config)#int <serial int.>
+	R1(config-if)#encapsulation ppp
+	R1(config-if)#ppp authentication chap
+	
+	R2(config)#username <R1> password <jelszó>
+	R2(config)#int <serial int.>
+	R2(config-if)#encapsulation ppp
+	R2(config-if)#ppp authentication chap
+	
+PAP:
+
+	R1(config)#username <R2> password <jelszó>
+	R1(config)#int <serial int.>
+	R1(config-if)#encapsulation ppp
+	R1(config-if)#ppp authentication pap
+	R1(config-if)#ppp pap sent-username R1 password <jelszó>
+	
+	R2(config)#username <R1> password <jelszó>
+	R2(config)#int <serial int.>
+	R2(config-if)#encapsulation ppp
+	R2(config-if)#ppp authentication pap
+	R2(config-if)#ppp pap sent-username R2 password <jelszó>
+	
+	
+	
+	
+Hasznos show parancsok
+
+sh run --> futó konfigurációt mutatja
+sh vlan --> vlanokat mutatja és melyik vlan-hoz mely interface tartozik (switchen célszerû)
+sh ip int br --> interface adatokat mutatja (ip cím, állapot)
+sh ip dhcp binding -->a dhcp-vel kiadott ip címekhez tartozó mac-címet adja ki
+sh spanning-tree
+
+
+Hasznos tippek:
+1,
+FONTOS!!!! Ha végeztél egy eszköz konfigurációjával mindig mentsd el! (tanár lehet nyom egy ki be kapcsolást és akkor elviszik az egész munkánk :D)
+
+ena
+copy run start 
+
+do copy run start // a do szócskával tudod elérni hogy bárhonnan mentsél ez vonatkozik bármlyik show parancsra is 
+
+2, Router konfigurálásánal mikor interface-nek adsz pl ip címet hasznos, hogy írjuk hozzá megjegyzést, hogy késõbb tudjuk hova lett kötve mihez (meg tanár vonhat le pontot emiatt is)
+
+ena
+conf t
+int <g0/0>
+desc <R1 to LAN1>
+
+3, VLAN és Etherchannel kialakításakor (én így szoktam, ha a feladat nem kéri specifikusan mit hova kötünk)
+	3 switch + 1 router + céleszközök esetén
+	-VLAN-okat létrehozom mindegyik kimásolva egy txt-be amit csak be kell pastelnem a CLI ablaknál (feltételezve hogy helyes szintaktikát alkalmazunk), mert ezek az esetek nagy részében azonosak
+	- VLAN interfacehez rendelése és etherchannel kialakítása: 
+		* mindegyik switchen (ahol a vlanokkal kell állítani) azonos portokra kötöm egyes vlanhoz tartozó klienst (pl S1-en a vlan10-hez tartozó interfacet pl a fa0/10-hez rendelem és a többi switchen is így járok el)
+		* Amelyik switch csatlakozik a routerhez azon a gigabites interface-re kötöm (ez 2960-as switch esetén)
+		* Etherchannelek számára kijelölöm magamnak melyiket használom, mivel 3 eszköznél többen nem kellett ezt kialakítani emiatt az elsõ switchportokra rakom rá (1-6 között)
+			S1-S2: 1-2 -> port-channel 1
+			S1-S3: 3-4 -> port-channel 2
+			S2-S1: 1-2 -> port-channel 1
+			S2-S3: 3-4 -> port-channel 3
+			S3-S1: 1-2 -> port-channel 2
+			S3-S2: 3-4 -> port-channel 3
+			
+
+
+
