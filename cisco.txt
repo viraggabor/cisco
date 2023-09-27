@@ -301,6 +301,9 @@ sh lldp --> lldp állapotta és adatok róla
 sh llpd interface --> 
 
 
+copy usbflash0:conf-file-name running-config
+
+
 Hasznos tippek:
 1,
 FONTOS!!!! Ha végeztél egy eszköz konfigurációjával mindig mentsd el! (tanár lehet nyom egy ki be kapcsolást és akkor elviszik az egész munkánk :D)
