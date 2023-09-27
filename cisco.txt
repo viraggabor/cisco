@@ -291,17 +291,23 @@ PAP:
 Hasznos show parancsok
 
 sh run --> futó konfigurációt mutatja
+sh run | begin <> az itt megjelölt ponttól mutatja a futó konfigurációt
+sh run <int g0/0> az adott blokknak a konfigurációját mutatja
 sh vlan --> vlanokat mutatja és melyik vlan-hoz mely interface tartozik (switchen célszerû)
 sh ip int br --> interface adatokat mutatja (ip cím, állapot)
 sh ip dhcp binding -->a dhcp-vel kiadott ip címekhez tartozó mac-címet adja ki
 sh spanning-tree
-sh inventory -->
+sh inventory --> leltárba mutatja az itt található eszközöket
 sh cdp neighbor --> CDP protokoll álal használt eszközökett listázza, mely interface-re van csalakoztatva, milyen eszköz stb
 sh lldp --> lldp állapotta és adatok róla
 sh llpd interface --> 
 
 
-copy usbflash0:conf-file-name running-config
+Egyéb hasznos parancsok
+
+copy usbflash0: <conf-file-name> running-config --> Egy USB-ről történő fájlmásolása a config-ba
+
+
 
 
 Hasznos tippek:
