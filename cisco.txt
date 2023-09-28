@@ -1,4 +1,4 @@
-Alap konf: // ha esetleg sok eszköznek (2-tõl több) kell egy alapkonfigurációt csinálni ugyanazokkal a jelszavakkal  ajánlom hogy itt írd a jelszavakat és másold be a kódot a paste funkcióval a packet tracert-be és a kedves vendég szövegért feleõséget nem vállalok
+Alap konf: --> ha esetleg sok eszköznek (2-tõl több) kell egy alapkonfigurációt csinálni ugyanazokkal a jelszavakkal  ajánlom hogy itt írd a jelszavakat és másold be a kódot a paste funkcióval a packet tracert-be és a kedves vendég szövegért feleõséget nem vállalok
 
 ena
 conf t
@@ -16,12 +16,13 @@ hostname valami
 
 Security cuccok:
 
-ena
-conf t
-login block-for <idõ mp-ben> attempts <próbák száma> within <idõ mp-ben> //blokkolja a belépést ha sokszor elrontjuk
-security password min-length <szám> //a jelszavaknak minimum ilyen hosszúnak kell lenniük
-line vty <vonalak száma> // konzol vonalon is ugyanúgy müködik
-exec-timeout <perc> <mp> // ennyi idõ után le dob az adott vonalról 
+	ena
+	conf t
+	login block-for <idõ mp-ben> attempts <próbák száma> within <idõ mp-ben> -->blokkolja a belépést ha sokszor elrontjuk
+	security password min-length <szám> -->a jelszavaknak minimum ilyen hosszúnak kell lenniük
+	line vty <vonalak száma> --> konzol vonalon is ugyanúgy müködik
+	exec-timeout <perc> <mp> --> ennyi idõ után le dob az adott vonalról
+	ser pass -->titkosítja a jelszavainkat (running config alatt nem látszódik)
 
 
 SSH:	
@@ -37,36 +38,36 @@ SSH:
 
 
 DHCP:
-ena
-conf t
-ip dhcp ex <192.168.1.1> <192.168.1.69> // tól-ig tartományba nem oszhatóvá teszi a címeket
-ip dhcp pool <valami>
-network <192.168.1.0> <255.255.255.128> //valami hálócím + maszk
-default-router <192.168.1.126>
-dns-server <8.8.8.8> 
+	ena
+	conf t
+	ip dhcp ex <192.168.1.1> <192.168.1.69> --> tól-ig tartományba nem oszhatóvá teszi a címeket
+	ip dhcp pool <valami>
+	network <192.168.1.0> <255.255.255.128> -->valami hálócím + maszk
+	default-router <192.168.1.126>
+	dns-server <8.8.8.8> 
 
 
 VLAN:
 	
-	switch: //switchen szükséges konfiguráció
+	switch: --> switchen szükséges konfiguráció
 	ena 
 	conf t
-	vlan <szám> //létrehozza a vlant
+	vlan <szám> --> létrehozza a vlant
 	name <akármi>
 	exit
-	int <int. azon>	---> több esetén int range <kezdõ port> <záró> //ez(ek) ami a gép/szerver felé megy azon a portokon kell kiadni
+	int <int. azon>	--> több esetén int range <kezdõ port> <záró> --> ez(ek) ami a gép/szerver felé megy azon a portokon kell kiadni
 	sw mo ac
 	sw ac vlan <vlan id>
 	int <int. azon>
-	sw mode tr // azon az interfacen kell kiadni mely a router felé megy 
+	sw mode tr --> azon az interfacen kell kiadni mely a router felé megy 
 	
-	router: //routeren szükséges konfiguráció
+	router: -->routeren szükséges konfiguráció
 	ena
 	conf t
 	int <alint. azon.> (pl fa0/0.10)
 	encapsulation dot1q <vlan id>
 	ip add <átjáró> <maszk>
-	exit --->a rendes int.-et kell bekapcsolni
+	exit ---> a rendes int.-et kell bekapcsolni
 
 
 Etherchannel:
@@ -74,7 +75,7 @@ Etherchannel:
 	PAgP:
 	ena
 	conf t
-	int <int. azon> || int range <kezdõ int. azon> <vég int azon> // feladattól függ melyiket kell használni
+	int <int. azon> || int range <kezdõ int. azon> <vég int azon> --> feladattól függ melyiket kell használni
 	sh 
 	channel-group <azon> mode desirable
 	no shut
@@ -84,19 +85,19 @@ Etherchannel:
 	LACP
 	ena
 	conf t
-	int <int. azon> || int range <kezdõ int. azon> <vég int azon> // feladattól függ melyiket kell használni
+	int <int. azon> || int range <kezdõ int. azon> <vég int azon> --> feladattól függ melyiket kell használni
 	sh 
 	channel-group <azon> mode active
 	no shut
 	int port-channel <azon>
 	sw mode tr
 	
-	Negotiated LACP //egyik switchen aktív állapot a másik switchen passzív
+	Negotiated LACP --> egyik switchen aktív állapot a másik switchen passzív
 	
 	S1
 	ena
 	conf t
-	int <int. azon> || int range <kezdõ int. azon> <vég int azon> // feladattól függ melyiket kell használni
+	int <int. azon> || int range <kezdõ int. azon> <vég int azon> --> feladattól függ melyiket kell használni
 	sh 
 	channel-group <azon> mode active
 	no shut
@@ -106,7 +107,7 @@ Etherchannel:
 	S2
 	ena
 	conf t
-	int <int. azon> || int range <kezdõ int. azon> <vég int azon> // feladattól függ melyiket kell használni
+	int <int. azon> || int range <kezdõ int. azon> <vég int azon> --> feladattól függ melyiket kell használni
 	sh 
 	channel-group <azon> mode passive
 	no shut
@@ -117,11 +118,11 @@ Etherchannel:
 STP:
 	ena
 	conf t
-	spanning-tree mode <stp/rstp/mst> //rstp a default állapot szóval elvileg nem kell ezen változtatni
-	spanning-tree priority <szám> // priority minél kisebb annál elõbb van alapérték 32768 a lépték elvileg 4096? 
+	spanning-tree mode <stp/rstp/mst> --> rstp a default állapot szóval elvileg nem kell ezen változtatni
+	spanning-tree priority <szám> --> priority minél kisebb annál elõbb van alapérték 32768 a lépték elvileg 4096? 
 	
 	opcionális parancsok
-	spanning-tree hello-time <mp (1-10)> //alapértelmezett a 2,  hello üzenetet küld a többi eszköznek
+	spanning-tree hello-time <mp (1-10)> --> alapértelmezett a 2, hello üzenetet küld a többi eszköznek
 	spanning-tree max-age <mp (max 40)> 
 	spanning-tree forward-time <mp>
 	spanning-tree loopback-guard 	
@@ -132,10 +133,10 @@ FHRP:
 	ena 
 	conf t
 	int <int azon>
-	standby ver 2 // ver1 csak az ipv4-et  támogatja
+	standby ver 2 --> ver1 csak az ipv4-et  támogatja
 	standby 1 ip <virtuális átjáró címe>
 	------  csak a fönök routeren kell vagy ahol a prioritást változtatunk 
-	standby 1 priority <szám> // olyan szám mely 100-nál nagyobb mivel a 100 az alapérték, ezzel a "fönök" routert állítjuk be 
+	standby 1 priority <szám> --> olyan szám mely 100-nál nagyobb mivel a 100 az alapérték, ezzel a "fönök" routert állítjuk be 
 	standby 1 preempt
 	------
 	
@@ -149,7 +150,7 @@ Forgalom irányítás:
 
 		ena
 		conf t
-		ip route 0.0.0.0 0.0.0.0 <köv. ugrás> ---> legegyszerûbb
+		ip route 0.0.0.0 0.0.0.0 <köv. ugrás> --> legegyszerûbb
 		ip route <cél> <cél maszk> <köv ugrás>
 
 	Dinamikus:
@@ -168,7 +169,7 @@ Forgalom irányítás:
 			ena
 			conf t
 			router ospf <1-65535>
-			network <hál. cím> <hál. wildcard maszk> area <terület azon.> //wildcard maszk = maszknak az "inverze" -> 255.255.255.0 akkor 0.0.0.255
+			network <hál. cím> <hál. wildcard maszk> area <terület azon.> --> wildcard maszk = maszknak az "inverze" --> 255.255.255.0 akkor 0.0.0.255
 			def or --> statikus útvonalak hirdetése
 			pass <int. azon.>
 			
@@ -176,7 +177,7 @@ Forgalom irányítás:
 			ena
 			conf t
 			router eigrp <1-65535>
-			network <hál. cím> <maszk/umaszk> ---> maszk nem fontos
+			network <hál. cím> <maszk/umaszk> --> maszk nem fontos
 			pass <int. azon.>
 			red stat --> alapértelmezett útvonalak hirdetése
 		
@@ -231,10 +232,10 @@ NAT:
 		
 ACL:
 
-	sima: --> a célhoz legközelebb célszerû elhelyezni
+	sima: --> a célhoz legközelebb kell elhelyezni
 		ena
 		conf t
-		access-list <1-99> <permit/deny> <hál cím> <wildcard> //1. lehetõség
+		access-list <1-99> <permit/deny> <hál cím> <wildcard> -->1. lehetõség
 		access-list <1-99> <permit/deny> <any>
 		access-list <1-99> <permit/deny> <host> <állomás címe>
 		int <bejövõ int.>
@@ -242,12 +243,12 @@ ACL:
 		int <kimenõ int.>
 		ip access-group <ACL száma> out
 	
-	kiterjesztett:
+	kiterjesztett: --> forráshoz legközelebb kell elhelyezni
 		ena
 		conf t
-		access-list <100-199> <permit/deny> <protokoll(?)> <hál cím> <wildcard> //1. lehetõség	
-		access-list <100-199> <permit/deny> <protokoll(?)> <any> //2. lehetõség
-		access-list <100-199> <permit/deny> <protokoll(?)> <host> <állomás címe> //3. lehetõség
+		access-list <100-199> <permit/deny> <protokoll(?)> <hál cím> <wildcard> -->1. lehetõség	
+		access-list <100-199> <permit/deny> <protokoll(?)> <any> -->2. lehetõség
+		access-list <100-199> <permit/deny> <protokoll(?)> <host> <állomás címe> -->3. lehetõség
 		
 		access-list <100-199> permit ip any any --> fontos 
 		
@@ -286,26 +287,48 @@ PAP:
 	R2(config-if)#ppp pap sent-username R2 password <jelszó>
 	
 	
-	
+Radius:
+
+	S1(config)#radius server <szerver neve>
+	S1(config-radius-server)#key <0/6/7/ (shared key)> <radius szerveren lévő jelszó> --> 0 kódolatlan kulcsot adunk meg
+																					  --> 6 kódolt kulcs megadása
+																					  --> 7 titkos kulcs megadása
 	
 Hasznos show parancsok
 
-sh run --> futó konfigurációt mutatja
-sh run | begin <> az itt megjelölt ponttól mutatja a futó konfigurációt
-sh run <int g0/0> az adott blokknak a konfigurációját mutatja
-sh vlan --> vlanokat mutatja és melyik vlan-hoz mely interface tartozik (switchen célszerû)
-sh ip int br --> interface adatokat mutatja (ip cím, állapot)
-sh ip dhcp binding -->a dhcp-vel kiadott ip címekhez tartozó mac-címet adja ki
-sh spanning-tree
-sh inventory --> leltárba mutatja az itt található eszközöket
-sh cdp neighbor --> CDP protokoll álal használt eszközökett listázza, mely interface-re van csalakoztatva, milyen eszköz stb
-sh lldp --> lldp állapotta és adatok róla
-sh llpd interface --> 
+	sh run --> futó konfigurációt mutatja
+	sh run | begin <> --> az itt megjelölt ponttól mutatja a futó konfigurációt
+	sh run <int g1/0/1> --> az adott blokknak a konfigurációját mutatja
+	sh vlan --> vlanokat mutatja és melyik vlan-hoz mely interface tartozik (switchen célszerû)
+	sh ip int br --> interface adatokat mutatja (ip cím, állapot)
+	sh ip dhcp binding -->a dhcp-vel kiadott ip címekhez tartozó mac-címet adja ki
+	sh spanning-tree
+	sh inventory --> leltárba mutatja az itt található eszközöket
+	sh cdp neighbor --> CDP protokoll álal használt eszközökett listázza, mely interface-re van csalakoztatva, milyen eszköz stb
+	sh lldp --> lldp állapota és adatok róla
+	sh lldp interface --> 
+	sh flash: -->flashben található elemek listája
+	sh usbflash0: -->USB-n található elemeket listázza ki
+	sh ip route --> IP routing table kiíratása 
+	sh arp --> ARP tábla kiiratása
+	sh access-lists --> ACL lista kiíratása
+	sh users --> Az eszközt aktuálisan használók listázása
+	sh history --> A korábban kiadott parancsok listázása
 
 
 Egyéb hasznos parancsok
 
-copy usbflash0: <conf-file-name> running-config --> Egy USB-ről történő fájlmásolása a config-ba
+	ena
+	copy usbflash0: <conf-file-name> running-config --> Egy USB-ről történő fájlmásolása a running config-ba
+
+	ena
+	copy usbflash0: <conf-file-name> startup-config
+	reload -->Egy USB-ról történő fájlmásolás a startup config-ba majd egy hidegindítás
+	
+	ena
+	terminal monitor --> A terminál kimenetre kiírja az eseményeket (pl eszköz csatlakoztatása és leválasztása) alapértelmezetten be van ez kapcsolva kikapcsolása a no parancs megadásával lehetséges
+	
+	do --> ennek a segítségével elérhető, hogy bármilyen parancsot ki tudjunk adni az estzközön (global módban nem)
 
 
 
@@ -317,7 +340,7 @@ FONTOS!!!! Ha végeztél egy eszköz konfigurációjával mindig mentsd el! (tan
 ena
 copy run start 
 
-do copy run start // a do szócskával tudod elérni hogy bárhonnan mentsél ez vonatkozik bármlyik show parancsra is 
+do copy run start --> a do szócskával tudod elérni hogy bárhonnan mentsél ez vonatkozik bármlyik show parancsra is 
 
 2, Router konfigurálásánal mikor interface-nek adsz pl ip címet hasznos, hogy írjuk hozzá megjegyzést, hogy késõbb tudjuk hova lett kötve mihez (meg tanár vonhat le pontot emiatt is)
 
