@@ -323,21 +323,28 @@ Egyéb hasznos parancsok:
 	ena
 	conf t
 	default int <int. azon> --> a konfigurált interface alaphelyzetbe állítása
-
+	default int range <kezdő int azon> <záró int azon> --> több interface alaphelyzetbe állítása
+	
 	ena
 	conf t
 	int <int. azon> 
-	power inline auto --> POE bekapcsolása
-	power inline never --> POE kikapcsolása
+	power inline auto --> POE bekapcsolása az interface-n
+	power inline never --> POE kikapcsolása az interface-n
+
+	ena
+	conf t
+	int <int azon> --> int range is ugyanúgy müködik itt is mint korábban említve volt 
+	sw voice vlan <Voice vlan ID> --> VOiP üzenetek továbítása a megadott porton történik 
+		
 
 
 Cisco 7911 IP telefon gyári beállításokra hozása
 
-Step 1 Unplug the power cable from the phone and then plug it back in.
-	The phone begins its power up cycle.
-Step 2 While the phone is powering up, and before the Applications Menu button flashes on and off, press and hold #.
-	Continue to hold # until the message LED on the handset flashes on and off in sequence in red.
-Step 3 Release # and press 123456789*0#.
+	Step 1 Unplug the power cable from the phone and then plug it back in.
+		The phone begins its power up cycle.
+	Step 2 While the phone is powering up, and before the Applications Menu button flashes on and off, press and hold #.
+		Continue to hold # until the message LED on the handset flashes on and off in sequence in red.
+	Step 3 Release # and press 123456789*0#.
 
 
 Hasznos show parancsok
@@ -347,6 +354,7 @@ Hasznos show parancsok
 	sh run <int g1/0/1> --> az adott blokknak a konfigurációját mutatja
 	sh vlan --> vlanokat mutatja és melyik vlan-hoz mely interface tartozik (switchen célszerû)
 	sh ip int br --> interface adatokat mutatja (ip cím, állapot)
+	sh int status --> interface adatok (port,megjegyzés,állapot,vlan stb)
 	sh ip dhcp binding -->a dhcp-vel kiadott ip címekhez tartozó mac-címet adja ki
 	sh spanning-tree
 	sh inventory --> leltárba mutatja az itt található eszközöket
