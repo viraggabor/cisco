@@ -293,30 +293,20 @@ Radius:
 	S1(config-radius-server)#key <0/6/7/ (shared key)> <radius szerveren lévő jelszó> --> 0 kódolatlan kulcsot adunk meg
 																					  --> 6 kódolt kulcs megadása
 																					  --> 7 titkos kulcs megadása
+
+
+Loop Detection Guard: (L2-n müködik, felette nem támogatott --> switch)
 	
-Hasznos show parancsok
+	ena
+	conf t
+	int <int. azon> 
+	loopdetect --> ki kell adni először ez a parancsot, hogy bekapcsolt állapotba kerüljön
+	loopdetect time <1-10> --> mekkora időközönként végezze el ezt a fajta lekérdezést
+	loopdetect action syslog 
+	loopdetect source-port --> a forrás port err disable állapotba kerül
+	
 
-	sh run --> futó konfigurációt mutatja
-	sh run | begin <> --> az itt megjelölt ponttól mutatja a futó konfigurációt
-	sh run <int g1/0/1> --> az adott blokknak a konfigurációját mutatja
-	sh vlan --> vlanokat mutatja és melyik vlan-hoz mely interface tartozik (switchen célszerû)
-	sh ip int br --> interface adatokat mutatja (ip cím, állapot)
-	sh ip dhcp binding -->a dhcp-vel kiadott ip címekhez tartozó mac-címet adja ki
-	sh spanning-tree
-	sh inventory --> leltárba mutatja az itt található eszközöket
-	sh cdp neighbor --> CDP protokoll álal használt eszközökett listázza, mely interface-re van csalakoztatva, milyen eszköz stb
-	sh lldp --> lldp állapota és adatok róla
-	sh lldp interface --> 
-	sh flash: -->flashben található elemek listája
-	sh usbflash0: -->USB-n található elemeket listázza ki
-	sh ip route --> IP routing table kiíratása 
-	sh arp --> ARP tábla kiiratása
-	sh access-lists --> ACL lista kiíratása
-	sh users --> Az eszközt aktuálisan használók listázása
-	sh history --> A korábban kiadott parancsok listázása
-
-
-Egyéb hasznos parancsok
+Egyéb hasznos parancsok:
 
 	ena
 	copy usbflash0: <conf-file-name> running-config --> Egy USB-ről történő fájlmásolása a running config-ba
@@ -330,6 +320,47 @@ Egyéb hasznos parancsok
 	
 	do --> ennek a segítségével elérhető, hogy bármilyen parancsot ki tudjunk adni az estzközön (global módban nem)
 
+	ena
+	conf t
+	default int <int. azon> --> a konfigurált interface alaphelyzetbe állítása
+
+	ena
+	conf t
+	int <int. azon> 
+	power inline auto --> POE bekapcsolása
+	power inline never --> POE kikapcsolása
+
+
+Cisco 7911 IP telefon gyári beállításokra hozása
+
+Step 1 Unplug the power cable from the phone and then plug it back in.
+	The phone begins its power up cycle.
+Step 2 While the phone is powering up, and before the Applications Menu button flashes on and off, press and hold #.
+	Continue to hold # until the message LED on the handset flashes on and off in sequence in red.
+Step 3 Release # and press 123456789*0#.
+
+
+Hasznos show parancsok
+
+	sh run --> futó konfigurációt mutatja
+	sh run | begin <> --> az itt megjelölt ponttól mutatja a futó konfigurációt
+	sh run <int g1/0/1> --> az adott blokknak a konfigurációját mutatja
+	sh vlan --> vlanokat mutatja és melyik vlan-hoz mely interface tartozik (switchen célszerû)
+	sh ip int br --> interface adatokat mutatja (ip cím, állapot)
+	sh ip dhcp binding -->a dhcp-vel kiadott ip címekhez tartozó mac-címet adja ki
+	sh spanning-tree
+	sh inventory --> leltárba mutatja az itt található eszközöket
+	sh cdp neighbor --> CDP protokoll által használt eszközökett listázza, mely interface-re van csalakoztatva, milyen eszköz stb
+	sh lldp --> lldp állapota és adatok róla
+	sh lldp interface --> 
+	sh flash: -->flashben található elemek listája
+	sh usbflash0: -->USB-n található elemeket listázza ki
+	sh ip route --> IP routing table kiíratása 
+	sh arp --> ARP tábla kiiratása
+	sh access-lists --> ACL lista kiíratása
+	sh users --> Az eszközt aktuálisan használók listázása
+	sh history --> A korábban kiadott parancsok listázása
+	sh power inline --> POE portok státuszát írja ki (állapotukat) 
 
 
 
